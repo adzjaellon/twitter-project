@@ -1,6 +1,9 @@
 from django.db import models
 from django.conf import settings
 from user_profile.models import Profile
+from django.utils.text import slugify
+from taggit.managers import TaggableManager
+from django.shortcuts import reverse
 
 
 class Post(models.Model):
@@ -9,20 +12,30 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True)
     picture = models.ImageField(blank=True, upload_to='post_pictures/')
-    email = models.EmailField()
+
+    tags = TaggableManager()
+
+    def get_tags(self):
+        return self.tags.all()
+
+    def get_common_tags(self):
+        return Post.tags.most_common()[:5]
+
+    def get_comment_number(self):
+        return self.comment_set.all().count()
 
     def __str__(self):
-        return f'Post: {self.author.username}-{self.created}'
-
-    class Meta:
-        ordering = ('-created', )
+        return f'Post: {self.author.user.username}-{self.created}'
 
     def save(self, *args, **kwargs):
         slugs = [post.slug for post in Post.objects.all()]
-        self.slug = str(self.created) + str(self.user.id)
+        self.slug = str(slugify(self.created)) + str(self.author.id)
         while self.slug in slugs:
-            self.slug += str(self.user.id)
+            self.slug += str(self.author.id)
         return super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ('-created', )
 
 
 class Comment(models.Model):

@@ -19,7 +19,7 @@
         <div class="container">
           <!-- Navbar Brand -->
           <div class="navbar-header d-flex align-items-center justify-content-between">
-            <!-- Navbar Brand --><a href="index.html" class="navbar-brand">Bootstrap Blog</a>
+            <!-- Navbar Brand --><a href="{% url 'post:home' %}" class="navbar-brand">Bootstrap Blog</a>
             <!-- Toggle Button-->
             <button type="button" data-toggle="collapse" data-target="#navbarcollapse" aria-controls="navbarcollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span></span><span></span><span></span></button>
           </div>
@@ -27,9 +27,7 @@
           <div id="navbarcollapse" class="collapse navbar-collapse">
             <ul class="navbar-nav ml-auto">
               <li class="nav-item"><a href="{% url 'post:home' %}" class="nav-link ">Home</a>
-              </li>
-              <li class="nav-item"><a href="{% url 'post:blog' %}" class="nav-link ">Blog</a>
-              </li>
+
               <li class="nav-item"><a href="post.html" class="nav-link active ">Post</a>
               </li>
               <li class="nav-item"><a href="#" class="nav-link ">Contact</a>
