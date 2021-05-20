@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5">
+        {% if request.user == comment_user %}
+        <div class="row text-center">
+            <i>Are you sure you want to delete comment: "<b>{{ object.body }}</b>" added by?</i>
+            <form action="" method="post">
+                {% csrf_token %}
+                <br>
+                <button type="submit" class="btn btn-danger mt-2">Delete</button>
+            </form>
+        </div>
+
+        {% else %}
+        <div class="row text-center">
+            <h1>You have no permission to do that.</h1>
+        </div>
+        {% endif %}
+        <hr>
+        <a class="btn btn-info" href="{% url 'post:post-details' post_slug %}">Back</a>
+
+    </div>
+{% endblock content %}

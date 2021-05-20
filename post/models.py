@@ -15,6 +15,10 @@ class Post(models.Model):
 
     tags = TaggableManager()
 
+    @property
+    def comments(self):
+        return self.comment_set.all().order_by('-created')
+
     def get_tags(self):
         return self.tags.all()
 
@@ -45,4 +49,4 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Comment: {self.author.username} | {self.created}'
+        return f'Comment: {self.author.user.username} | {self.created}'

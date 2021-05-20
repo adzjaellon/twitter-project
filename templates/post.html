@@ -9,7 +9,7 @@
         <main class="post blog-post col-lg-8">
             <div class="container">
                 <div class="post-single">
-                    <div class="post-thumbnail"><img src="{% static 'img/blog-post-3.jpeg' %}" alt="..." class="img-fluid"></div>
+                    <div class="post-thumbnail"><img src="{{ post.picture.url }}" alt="..." class="img-fluid post-details-picture"></div>
                     <div class="post-details">
                         <div class="post-meta d-flex justify-content-between">
                             <div class="category"><a href="#">Business</a><a href="#">Financial</a></div>
@@ -44,135 +44,61 @@
 
                         <div class="post-comments">
                             <header>
-                                <h3 class="h6">Post Comments<span class="no-of-comments">(3)</span></h3>
+                                <h3 class="h6">Post Comments<span class="no-of-comments">{{ post.get_comment_number }}</span></h3>
                             </header>
-                            <div class="comment">
-                                <div class="comment-header d-flex justify-content-between">
-                                    <div class="user d-flex align-items-center">
-                                        <div class="image">
-                                            <img src="{% static 'img/user.svg' %}" alt="..."
-                                                                class="img-fluid rounded-circle img-responsive"></div>
-                                        <div class="title"><strong>Jabi Hernandiz</strong><span
-                                                class="date">May 2016</span></div>
-                                    </div>
-                                </div>
-                                <div class="comment-body">
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                                </div>
-                            </div>
-                            <div class="comment">
-                                <div class="comment-header d-flex justify-content-between">
-                                    <div class="user d-flex align-items-center">
-                                        <div class="image"><img src="{% static 'img/user.svg' %}" alt="..."
-                                                                class="img-fluid rounded-circle"></div>
-                                        <div class="title"><strong>Nikolas</strong><span class="date">May 2016</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="comment-body">
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                                </div>
-                            </div>
-                            <div class="comment">
-                                <div class="comment-header d-flex justify-content-between">
-                                    <div class="user d-flex align-items-center">
-                                        <div class="image"><img src="{% static 'img/user.svg' %}" alt="..."
-                                                                class="img-fluid rounded-circle"></div>
-                                        <div class="title"><strong>John Doe</strong><span class="date">May 2016</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="comment-body">
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="add-comment">
-                            <header>
-                                <h3 class="h6">Leave a reply</h3>
-                            </header>
-                            <form action="#" class="commenting-form">
-                                <div class="row">
 
-                                    <div class="form-group col-md-12">
-                                        <textarea name="usercomment" id="usercomment" placeholder="Type your comment"
-                                                  class="form-control"></textarea>
+                            {% for comment in post.comments %}
+                                <div class="comment">
+                                    <div class="comment-header d-flex justify-content-between">
+                                        <div class="user d-flex align-items-center">
+                                            <div class="image">
+                                                <img src="{{ comment.author.avatar.url }}" alt="..."
+                                                                    class="img-fluid rounded-circle img-responsive"></div>
+                                            <div class="title">
+
+                                                <strong>
+                                                    {{ comment.author.user.username }}
+                                                    {% if comment.author.user == request.user %}
+                                                        <a href="{% url 'post:comment-delete' comment.pk %}" class="btn btn-outline-danger btn-sm ml-3">Delete</a>
+                                                        <a href="{% url 'post:comment-update' comment.pk %}" class="btn btn-outline-warning btn-sm ml-3">Update</a>
+                                                    {% endif %}
+                                                </strong>
+                                                <span class="date">{{ comment.created|timesince }}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group col-md-12">
-                                        <button type="submit" class="btn btn-secondary">Submit Comment</button>
+                                    <div class="comment-body">
+                                        <p>{{ comment.body }}</p>
                                     </div>
                                 </div>
-                            </form>
+                            {% endfor %}
+
                         </div>
+
+                        {% if user.is_authenticated %}
+                            <div class="add-comment">
+                                <header>
+                                    <h3 class="h6">Leave a reply</h3>
+                                </header>
+                                <form action="#" class="commenting-form" method="post">
+                                    <div class="row">
+                                        <div class="form-group col-md-12">
+                                                {% csrf_token %}
+                                                {{ form.body }}
+
+                                               <div class="form-group col-md-12">
+                                                   <button type="submit" class="btn btn-secondary mt-2">Submit Comment</button>
+                                               </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </main>
-        <aside class="col-lg-4">
-            <!-- Widget [Search Bar Widget]-->
-            <div class="widget search">
-                <header>
-                    <h3 class="h6">Search the blog</h3>
-                </header>
-                <form action="#" class="search-form">
-                    <div class="form-group">
-                        <input type="search" placeholder="What are you looking for?">
-                        <button type="submit" class="submit"><i class="icon-search"></i></button>
-                    </div>
-                </form>
-            </div>
-            <!-- Widget [Latest Posts Widget]        -->
-            <div class="widget latest-posts">
-                <header>
-                    <h3 class="h6">Latest Posts</h3>
-                </header>
-                <div class="blog-posts"><a href="#">
-                    <div class="item d-flex align-items-center">
-                        <div class="image"><img src="{% static 'img/small-thumbnail-1.jpg' %}" alt="..." class="img-fluid"></div>
-                        <div class="title"><strong>Alberto Savoia Can Teach You About</strong>
-                            <div class="d-flex align-items-center">
-                                <div class="views"><i class="icon-eye"></i> 500</div>
-                                <div class="comments"><i class="icon-comment"></i>12</div>
-                            </div>
-                        </div>
-                    </div>
-                </a><a href="#">
-                    <div class="item d-flex align-items-center">
-                        <div class="image"><img src="{% static 'img/small-thumbnail-2.jpg' %}" alt="..." class="img-fluid"></div>
-                        <div class="title"><strong>Alberto Savoia Can Teach You About</strong>
-                            <div class="d-flex align-items-center">
-                                <div class="views"><i class="icon-eye"></i> 500</div>
-                                <div class="comments"><i class="icon-comment"></i>12</div>
-                            </div>
-                        </div>
-                    </div>
-                </a><a href="#">
-                    <div class="item d-flex align-items-center">
-                        <div class="image"><img src="{% static 'img/small-thumbnail-3.jpg' %}" alt="..." class="img-fluid"></div>
-                        <div class="title"><strong>Alberto Savoia Can Teach You About</strong>
-                            <div class="d-flex align-items-center">
-                                <div class="views"><i class="icon-eye"></i> 500</div>
-                                <div class="comments"><i class="icon-comment"></i>12</div>
-                            </div>
-                        </div>
-                    </div>
-                </a></div>
-            </div>
-            <!-- Widget [Categories Widget]-->
-            <div class="widget categories">
-                <header>
-                    <h3 class="h6">Categories</h3>
-                </header>
-                {% for tag in post.get_common_tags %}
-                    <div class="item d-flex justify-content-between"><a href="#">{{ tag }}</a><span>12</span></div>
-
-                {% endfor %}
-            </div>
-
-        </aside>
+        {% include 'sidebar.html' with common_tags=common_tags latest_posts=latest_posts %}
     </div>
 </div>
 

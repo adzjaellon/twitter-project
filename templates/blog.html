@@ -64,53 +64,7 @@
             </div>
         </main>
 
-        <aside class="col-lg-4">
-            <!-- Widget [Search Bar Widget]-->
-            <div class="widget search">
-                <header>
-                    <h3 class="h6">Search the blog</h3>
-                </header>
-                <form action="#" class="search-form">
-                    <div class="form-group">
-                        <input type="search" placeholder="What are you looking for?">
-                        <button type="submit" class="submit"><i class="icon-search"></i></button>
-                    </div>
-                </form>
-            </div>
-            <!-- Widget [Latest Posts Widget]        -->
-            <div class="widget latest-posts">
-                <header>
-                    <h3 class="h6">Latest Posts</h3>
-                </header>
-                <div class="blog-posts">
-                    {% for post in latest_posts %}
-                        <a href="{% url 'post:post-details' post.slug %}">
-                            <div class="item d-flex align-items-center">
-                                <div class="image"><img src="{{ post.picture.url }}" alt="..." class="img-fluid"></div>
-                                <div class="title"><strong>{{ post.body }}</strong>
-                                    <div class="d-flex align-items-center">
-                                        <div class="views">{{ post.created|timesince }}</div>
-                                        <div class="comments"><i class="icon-comment"></i>{{ post.get_comment_number }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    {% endfor %}
-
-                </div>
-            </div>
-            <!-- Widget [Categories Widget]-->
-            <div class="widget categories">
-                <header>
-                    <h3 class="h6">Categories</h3>
-                </header>
-                {% for tag in common_tags %}
-                    <div class="item d-flex justify-content-between"><a href="#">{{ tag }}</a><span>12</span></div>
-
-                {% endfor %}
-            </div>
-
-        </aside>
+        {% include 'sidebar.html' with common_tags=common_tags latest_posts=latest_posts %}
     </div>
 </div>
 
