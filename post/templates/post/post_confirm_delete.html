@@ -3,9 +3,9 @@
 
 {% block content %}
     <div class="container mt-5 mb-5">
-        {% if request.user == comment_user %}
+        {% if request.user == post_author %}
         <div class="row text-center">
-            <i>Are you sure you want to delete comment: "<b>{{ object.body }}</b>"</i>
+            <i>Are you sure you want to delete this post: "<b>{{ object.body }}</b>"?</i>
             <form action="" method="post">
                 {% csrf_token %}
                 <br>
@@ -15,7 +15,7 @@
 
         {% else %}
         <div class="row text-center">
-            <h1>You have no permission to delete that post.</h1>
+            <h1>You have no permission to do that.</h1>
         </div>
         {% endif %}
         <hr>

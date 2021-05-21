@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
 
+{% block content %}
 
 <div class="container">
     <div class="row">
@@ -11,9 +11,7 @@
                 <div class="post-single">
                     <div class="post-thumbnail"><img src="{{ post.picture.url }}" alt="..." class="img-fluid post-details-picture"></div>
                     <div class="post-details">
-                        <div class="post-meta d-flex justify-content-between">
-                            <div class="category"><a href="#">Business</a><a href="#">Financial</a></div>
-                        </div>
+
                         <h1>{{ post.body }}<a href="#"><i
                                 class="fa fa-bookmark-o"></i></a></h1>
                         <div class="post-footer d-flex align-items-center flex-column flex-sm-row">
@@ -28,17 +26,15 @@
                             </div>
                         </div>
                         <div class="post-body">
-                            <p class="lead">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-                                nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-
-
-
+                            {% if request.user == post.author.user %}
+                                <a href="{% url 'post:post-delete' post.slug %}" class="btn btn-outline-danger ml-3">Delete</a>
+                                <a href="{% url 'post:post-update' post.slug %}" class="btn btn-outline-warning ml-3">Update</a>
+                            {% endif %}
 
                         </div>
                         <div class="post-tags">
                             {% for tag in post.get_tags %}
-                                <a href="#" class="tag">{{ tag }}</a>
+                                <a href="{% url 'post:tag-posts' tag.name %}" class="tag">{{ tag }}</a>
                             {% endfor %}
                         </div>
 

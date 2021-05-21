@@ -11,6 +11,7 @@
             </div>
         </form>
     </div>
+
     <!-- Widget [Latest Posts Widget]        -->
     <div class="widget latest-posts">
         <header>
@@ -36,11 +37,12 @@
     <!-- Widget [Categories Widget]-->
     <div class="widget categories">
         <header>
-            <h3 class="h6">Categories</h3>
+            <h3 class="h6">Tags</h3>
         </header>
         {% for tag in common_tags %}
-        <div class="item d-flex justify-content-between"><a href="#">{{ tag.name }}</a><span>{{ tag.count }}</span>
-        </div>
+            <div class="item d-flex justify-content-between">
+                <a href="{% url 'post:tag-posts' tag.name %}">{{ tag.name }}</a><span>{{ tag.count }}</span>
+            </div>
 
         {% endfor %}
     </div>

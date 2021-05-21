@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5">
+
+        <form action="" class="commenting-form" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="form-group col-md-12">
+                    {% csrf_token %}
+                    <b>Tags:</b>
+                    {{ form.tags }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-12">
+                    {% csrf_token %}
+                    {{ form.body }}
+                    <br>
+                    {{ form.picture }}
+                    <div class="form-group col-md-12">
+                        <button type="submit" class="btn btn-secondary mt-2">Post</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <hr>
+        <a class="btn btn-info" href="{% url 'post:home' %}">Back</a>
+    </div>
+
+{% endblock content %}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="container mt-5 mb-5">
+        {% if request.user == post_author %}
+            <form action="" class="commenting-form" method="post" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        {% csrf_token %}
+                        <b>Tags:</b>
+                        {{ form.tags }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-12">
+                        {% csrf_token %}
+                        {{ form.body }}
+                        <br>
+                        {{ form.picture }}
+                        <div class="form-group col-md-12">
+                            <button type="submit" class="btn btn-secondary mt-2">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <div class="row text-center">
+                <h1>You have no permission to edit that post.</h1>
+            </div>
+        {% endif %}
+
+        <hr>
+        <a class="btn btn-info" href="{% url 'post:post-details' post_slug %}">Back</a>
+    </div>
+
+{% endblock content %}

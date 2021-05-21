@@ -11,7 +11,7 @@ class Post(models.Model):
     author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True)
-    picture = models.ImageField(blank=True, upload_to='post_pictures/')
+    picture = models.ImageField(upload_to='post_pictures/')
 
     tags = TaggableManager()
 
@@ -29,7 +29,7 @@ class Post(models.Model):
         return self.comment_set.all().count()
 
     def __str__(self):
-        return f'Post: {self.author.user.username}-{self.created}'
+        return f'Post: {self.author.user.username}-{self.created}-{self.body[:10]}'
 
     def save(self, *args, **kwargs):
         slugs = [post.slug for post in Post.objects.all()]

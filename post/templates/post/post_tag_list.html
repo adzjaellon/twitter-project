@@ -10,7 +10,7 @@
             <div class="container">
                 <div class="row">
 
-                    {% for post in posts %}
+                    {% for post in post_list %}
                         <div class="post col-xl-6">
                             <div class="post-thumbnail">
                                 <a href="{% url 'post:post-details' post.slug %}">
@@ -20,16 +20,16 @@
                             <div class="post-details">
                                 <div class="post-meta d-flex justify-content-between">
                                     <div class="date meta-last">{{ post.created|timesince }}</div>
-                                    <div class="category">
+                                    <div class="category"><a href="#">
                                         {% for tag in post.tags.all %}
-                                        <a href="#">{{ tag }} </a>
+                                            {{ tag }}
                                         {% endfor %}
-                                    </div>
+                                    </a></div>
                                 </div>
                                 <a href="post.html"></a>
                                 <p class="text-muted">{{ post.body }}</p>
-                                <div class="post-footer d-flex align-items-center">
-                                    <a href="#" class="author d-flex align-items-center flex-wrap">
+                                <div class="post-footer d-flex align-items-center"><a href="#"
+                                                                                      class="author d-flex align-items-center flex-wrap">
                                     <div class="avatar"><img src="{{ post.author.avatar.url }}" alt="..." class="img-fluid"></div>
                                     <div class="title"><span>{{ post.author }}</span></div>
                                 </a>

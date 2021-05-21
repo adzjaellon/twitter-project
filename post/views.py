@@ -1,9 +1,10 @@
 from django.shortcuts import render, reverse
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 from .models import Post, Comment
 from django.views.generic.edit import FormMixin
 from .forms import CommentCreateForm, PostCreateForm
 from django.db.models import Count, Q
+from taggit.models import Tag
 
 
 def search(request):
@@ -12,7 +13,9 @@ def search(request):
         queryset = Post.objects.all().filter(Q(body__icontains=q) | Q(tags__name__icontains=q)).distinct()
 
     context = {
-        'posts': queryset
+        'posts': queryset,
+        'latest_posts': Post.objects.order_by('-created')[:3],
+        'common_tags': Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
     }
     return render(request, 'blog.html', context)
 
@@ -20,8 +23,26 @@ def search(request):
 class PostList(ListView):
     model = Post
     context_object_name = 'posts'
-    paginate_by = 6
+    paginate_by = 4
     template_name = 'blog.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['latest_posts'] = Post.objects.order_by('-created')[:3]
+        context['common_tags'] = Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
+        return context
+
+
+class PostTagList(ListView):
+    model = Post
+    context_object_name = 'tag_posts'
+    template_name = 'post/post_tag_list.html'
+    paginate_by = 4
+
+    def get_queryset(self):
+        tag_name = self.request.resolver_match.kwargs.get('name')
+        tag = Tag.objects.get(name=tag_name)
+        return Post.objects.filter(tags__slug__in=tag.slug)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,6 +79,49 @@ class PostDetails(FormMixin, DetailView):
 
     def get_success_url(self):
         return self.request.META.get('HTTP_REFERER')
+
+
+class PostCreate(CreateView):
+    model = Post
+    form_class = PostCreateForm
+    template_name = 'post/post_create.html'
+    context_object_name = 'form'
+
+    def get_success_url(self):
+        return reverse('post:home')
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user.profile
+        return super().form_valid(form)
+
+
+class PostUpdate(UpdateView):
+    model = Post
+    form_class = PostCreateForm
+    template_name = 'post/post_update.html'
+
+    def get_success_url(self):
+        return reverse('post:home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post_author'] = self.get_object().author.user
+        context['post_slug'] = self.get_object().slug
+        return context
+
+
+class PostDelete(DeleteView):
+    model = Post
+    template_name = 'post/post_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('post:home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['post_author'] = self.get_object().author.user
+        context['post_slug'] = self.get_object().slug
+        return context
 
 
 class CommentUpdate(UpdateView):
