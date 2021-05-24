@@ -32,10 +32,7 @@ class Post(models.Model):
         return f'Post: {self.author.user.username}-{self.created}-{self.body[:10]}'
 
     def save(self, *args, **kwargs):
-        slugs = [post.slug for post in Post.objects.all()]
         self.slug = str(slugify(self.created)) + str(self.author.id)
-        while self.slug in slugs:
-            self.slug += str(self.author.id)
         return super().save(*args, **kwargs)
 
     class Meta:

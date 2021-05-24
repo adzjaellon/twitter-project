@@ -34,7 +34,7 @@
                 <li class="nav-item"><a href="#" class="nav-link ">Contact</a>
               </li>
               </li>
-                <li class="nav-item"><a href="#" class="nav-link ">Profile</a>
+                <li class="nav-item"><a href="{% url 'profile:profile-details' request.user.profile.slug %}" class="nav-link ">Profile</a>
               </li>
             </ul>
             <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1"></i></a></div>

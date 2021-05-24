@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 
 
 class Profile(models.Model):
@@ -11,6 +12,9 @@ class Profile(models.Model):
     bio = models.TextField(default='...', max_length=333)
     email = models.EmailField(blank=True)
 
+    def get_posts_number(self):
+        return self.post_set.all().count()
+
     def __str__(self):
         return self.user.username
 
@@ -18,8 +22,6 @@ class Profile(models.Model):
         ordering = ('-created', )
 
     def save(self, *args, **kwargs):
-        slugs = [profile.slug for profile in Profile.objects.all()]
-        self.slug = self.user.username + str(self.user.id)
-        while self.slug in slugs:
-            self.slug += str(self.user.id)
+        self.slug = str(slugify(self.created)) + str(self.user.id)
         return super().save(*args, **kwargs)
+

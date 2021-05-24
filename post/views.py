@@ -5,6 +5,8 @@ from django.views.generic.edit import FormMixin
 from .forms import CommentCreateForm, PostCreateForm
 from django.db.models import Count, Q
 from taggit.models import Tag
+from user_profile.models import Profile
+from itertools import chain
 
 
 def search(request):
@@ -25,6 +27,22 @@ class PostList(ListView):
     context_object_name = 'posts'
     paginate_by = 4
     template_name = 'blog.html'
+
+    def get_queryset(self):
+        profile = Profile.objects.get(user=self.request.user)
+        users = [user for user in profile.following.all()]
+        posts = []
+        if profile.user not in users:
+            posts.append(profile.post_set.all())
+
+        for user in users:
+            prof = Profile.objects.get(user=user)
+            posts.append(prof.post_set.all())
+
+        queryset = None
+        if len(posts):
+            queryset = sorted(chain(*posts), reverse=True, key=lambda obj: obj.created)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
