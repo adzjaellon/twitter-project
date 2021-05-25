@@ -23,9 +23,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'taggit',
+    'crispy_forms',
     'post',
     'user_profile'
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -113,6 +116,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
+
+LOGIN_URL = 'profile:login'
+LOGIN_REDIRECT_URL = 'post:home'
+LOGOUT_URL = 'profile:logout'
+LOGOUT_REDIRECT_URL = 'profile:login'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

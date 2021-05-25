@@ -7,6 +7,7 @@ from django.db.models import Count, Q
 from taggit.models import Tag
 from user_profile.models import Profile
 from itertools import chain
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def search(request):
@@ -22,7 +23,7 @@ def search(request):
     return render(request, 'blog.html', context)
 
 
-class PostList(ListView):
+class PostList(LoginRequiredMixin, ListView):
     model = Post
     context_object_name = 'posts'
     paginate_by = 4
@@ -51,7 +52,7 @@ class PostList(ListView):
         return context
 
 
-class PostTagList(ListView):
+class PostTagList(LoginRequiredMixin, ListView):
     model = Post
     context_object_name = 'tag_posts'
     template_name = 'post/post_tag_list.html'
@@ -69,7 +70,7 @@ class PostTagList(ListView):
         return context
 
 
-class PostDetails(FormMixin, DetailView):
+class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
     model = Post
     template_name = 'post.html'
     context_object_name = 'post'
@@ -99,7 +100,7 @@ class PostDetails(FormMixin, DetailView):
         return self.request.META.get('HTTP_REFERER')
 
 
-class PostCreate(CreateView):
+class PostCreate(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostCreateForm
     template_name = 'post/post_create.html'
@@ -113,7 +114,7 @@ class PostCreate(CreateView):
         return super().form_valid(form)
 
 
-class PostUpdate(UpdateView):
+class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostCreateForm
     template_name = 'post/post_update.html'
@@ -128,7 +129,7 @@ class PostUpdate(UpdateView):
         return context
 
 
-class PostDelete(DeleteView):
+class PostDelete(LoginRequiredMixin, DeleteView):
     model = Post
     template_name = 'post/post_confirm_delete.html'
 
@@ -142,7 +143,7 @@ class PostDelete(DeleteView):
         return context
 
 
-class CommentUpdate(UpdateView):
+class CommentUpdate(LoginRequiredMixin, UpdateView):
     model = Comment
     form_class = CommentCreateForm
     template_name = 'comment/comment_update.html'
@@ -157,7 +158,7 @@ class CommentUpdate(UpdateView):
         return context
 
 
-class CommentDelete(DeleteView):
+class CommentDelete(LoginRequiredMixin, DeleteView):
     model = Comment
     template_name = 'comment/comment_confirm_delete.html'
 

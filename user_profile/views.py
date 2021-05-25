@@ -2,9 +2,33 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView, View
 from .models import Profile
 from django.shortcuts import redirect, reverse
+from .forms import UserRegisterForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class FollowUser(View):
+class RegisterUser(View):
+    def post(self, request, *args, **kwargs):
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+        context = {
+            'form': form
+        }
+        return render(request, 'registration/register.html', context)
+
+    def get(self, request, *args, **kwargs):
+        form = UserRegisterForm()
+        context = {
+            'form': form
+        }
+        return render(request, 'registration/register.html', context)
+
+
+'''class LoginUser(View):
+    def post(self, request, *args, **kwargs):'''
+
+
+class FollowUser(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         my_profile = Profile.objects.get(user=request.user)
         pk = request.POST.get('pk')
@@ -27,7 +51,7 @@ class ProfileList(ListView):
         return Profile.objects.all().exclude(user=self.request.user)
 
 
-class ProfileDetail(DetailView):
+class ProfileDetail(LoginRequiredMixin, DetailView):
     model = Profile
     template_name = 'user_profile/profile_details.html'
     context_object_name = 'profile'
