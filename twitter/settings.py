@@ -123,13 +123,6 @@ LOGOUT_URL = 'profile:logout'
 LOGOUT_REDIRECT_URL = 'profile:login'
 
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = '587'
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'telawel9090@gmail.com'
-EMAIL_HOST_PASSWORD = 'adrianeczeq2'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 

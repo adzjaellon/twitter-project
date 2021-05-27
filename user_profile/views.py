@@ -74,7 +74,7 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
         return context
 
 
-class ProfileUpdate(UpdateView):
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
     template_name = 'user_profile/profile_update.html'
     context_object_name = 'profile'

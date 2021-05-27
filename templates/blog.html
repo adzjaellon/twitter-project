@@ -22,7 +22,7 @@
                                     <div class="date meta-last">{{ post.created|timesince }}</div>
                                     <div class="category">
                                         {% for tag in post.tags.all %}
-                                        <a href="#">{{ tag }} </a>
+                                            <a href="{% url 'post:tag-posts' tag.name %}">{{ tag }} </a>
                                         {% endfor %}
                                     </div>
                                 </div>
