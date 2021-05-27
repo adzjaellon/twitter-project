@@ -3,7 +3,7 @@
 
 {% block content %}
     <div class="container mt-5 mb-5">
-        {% if request.user == post_author %}
+        {% if request.user == profile.user %}
             <form action="" class="commenting-form" method="post" enctype="multipart/form-data">
 
                 <div class="row">
@@ -23,7 +23,7 @@
         {% endif %}
 
         <hr>
-        <a class="btn btn-info" href="{% url 'post:post-details' post_slug %}">Back</a>
+        <a class="btn btn-info" href="{% url 'profile:profile-details' profile.slug %}">Back</a>
     </div>
 
 {% endblock content %}

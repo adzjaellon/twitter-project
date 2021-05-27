@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView, DetailView, View, UpdateView
 from .models import Profile
 from django.shortcuts import redirect, reverse
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, ProfileUpdateForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 
 
 class RegisterUser(View):
@@ -11,6 +12,9 @@ class RegisterUser(View):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Your account has been created! You can log in now.')
+            return redirect('profile:login')
+
         context = {
             'form': form
         }
@@ -22,10 +26,6 @@ class RegisterUser(View):
             'form': form
         }
         return render(request, 'registration/register.html', context)
-
-
-'''class LoginUser(View):
-    def post(self, request, *args, **kwargs):'''
 
 
 class FollowUser(LoginRequiredMixin, View):
@@ -72,3 +72,13 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
         context['following'] = my_profile.following.all().count()
         context['followers'] = Profile.objects.filter(following=my_profile.user).count()
         return context
+
+
+class ProfileUpdate(UpdateView):
+    model = Profile
+    template_name = 'user_profile/profile_update.html'
+    context_object_name = 'profile'
+    form_class = ProfileUpdateForm
+
+    def get_success_url(self):
+        return reverse('profile:profile-details', kwargs={'slug': self.get_object().slug})
