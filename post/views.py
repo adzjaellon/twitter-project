@@ -1,4 +1,4 @@
-from django.shortcuts import render, reverse
+from django.shortcuts import render, reverse, get_object_or_404
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 from .models import Post, Comment
 from django.views.generic.edit import FormMixin
@@ -61,9 +61,9 @@ class PostTagList(LoginRequiredMixin, ListView):
     paginate_by = 4
 
     def get_queryset(self):
-        tag_name = self.request.resolver_match.kwargs.get('name')
-        tag = Tag.objects.get(name=tag_name)
-        return Post.objects.filter(tags__slug__in=tag.slug)
+        name = self.request.resolver_match.kwargs.get('name')
+        tag = get_object_or_404(Tag, name=name)
+        return Post.objects.filter(tags__name__in=[tag.name])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
