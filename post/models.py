@@ -1,9 +1,7 @@
 from django.db import models
 from django.conf import settings
 from user_profile.models import Profile
-from django.utils.text import slugify
 from taggit.managers import TaggableManager
-from django.shortcuts import reverse
 
 
 class Post(models.Model):
@@ -30,10 +28,6 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Post: {self.author.user.username}-{self.created}-{self.body[:10]}'
-
-    def save(self, *args, **kwargs):
-        self.slug = str(slugify(self.created)) + str(self.author.id)
-        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ('-created', )

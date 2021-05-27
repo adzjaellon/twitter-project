@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+import random
 
 
 class Profile(models.Model):
@@ -21,7 +22,4 @@ class Profile(models.Model):
     class Meta:
         ordering = ('-created', )
 
-    def save(self, *args, **kwargs):
-        self.slug = str(slugify(self.created)) + str(self.user.id)
-        return super().save(*args, **kwargs)
 

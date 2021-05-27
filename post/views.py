@@ -8,6 +8,8 @@ from taggit.models import Tag
 from user_profile.models import Profile
 from itertools import chain
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 
 
 def search(request):
@@ -111,6 +113,7 @@ class PostCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user.profile
+        form.instance.slug = slugify(self.request.user.id) + slugify(get_random_string(18))
         return super().form_valid(form)
 
 
