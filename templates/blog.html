@@ -8,8 +8,17 @@
         <!-- Latest Posts -->
         <main class="posts-listing col-lg-8">
             <div class="container">
-                <div class="row">
+                {% if messages %}
+                    <p class="card-text">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    </p>
+                {% endfor %}
 
+                {% endif %}
+                <div class="row">
                     {% for post in posts %}
                         <div class="post col-xl-6">
                             <div class="post-thumbnail">

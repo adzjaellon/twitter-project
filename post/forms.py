@@ -1,17 +1,19 @@
-from django.forms import ModelForm, Textarea
+from django import forms
 from .models import Comment, Post
 
 
-class CommentCreateForm(ModelForm):
+class CommentCreateForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ('body', )
         widgets = {
-            'body': Textarea(attrs={'name': 'usercomment', 'id': 'usercomment', 'class': 'form-control'})
+            'body': forms.Textarea(attrs={'name': 'usercomment', 'id': 'usercomment', 'class': 'form-control'})
         }
 
 
-class PostCreateForm(ModelForm):
+class PostCreateForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ('body', 'tags', 'picture')
+        fields = ('body', 'tags', 'picture', 'followers_only')
+
+

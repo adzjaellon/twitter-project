@@ -1,5 +1,5 @@
 from django.shortcuts import render, reverse, get_object_or_404
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, View
 from .models import Post, Comment
 from django.views.generic.edit import FormMixin
 from .forms import CommentCreateForm, PostCreateForm
@@ -10,19 +10,23 @@ from itertools import chain
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
+from django.contrib import messages
 
 
-def search(request):
-    q = request.GET.get('q')
-    if q:
-        queryset = Post.objects.all().filter(Q(body__icontains=q) | Q(tags__name__icontains=q)).distinct()
+class Search(View):
+    def get(self, request, **kwargs):
+        q = request.GET.get('q')
+        if q:
+            queryset = Post.objects.all().filter(Q(body__icontains=q) | Q(tags__name__icontains=q)).distinct()
+        else:
+            queryset = []
 
-    context = {
-        'posts': queryset,
-        'latest_posts': Post.objects.order_by('-created')[:3],
-        'common_tags': Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
-    }
-    return render(request, 'blog.html', context)
+        context = {
+            'posts': queryset,
+            'latest_posts': Post.objects.order_by('-created')[:3],
+            'common_tags': Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
+        }
+        return render(request, 'blog.html', context)
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -114,6 +118,7 @@ class PostCreate(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user.profile
         form.instance.slug = slugify(self.request.user.id) + slugify(get_random_string(18))
+        messages.success(self.request, 'Post has been created succesfully!')
         return super().form_valid(form)
 
 
@@ -130,6 +135,10 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
         context['post_author'] = self.get_object().author.user
         context['post_slug'] = self.get_object().slug
         return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Post has been updated!')
+        return super().form_valid(form)
 
 
 class PostDelete(LoginRequiredMixin, DeleteView):

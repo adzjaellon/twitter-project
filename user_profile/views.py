@@ -1,10 +1,35 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, View, UpdateView
 from .models import Profile
-from django.shortcuts import redirect, reverse
-from .forms import UserRegisterForm, ProfileUpdateForm
+from django.shortcuts import redirect, reverse, HttpResponse
+from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.core.mail import send_mail, BadHeaderError
+from decouple import config
+
+
+class ContactForm(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            form.user = request.user.username
+            subject = form.cleaned_data['user'] + '-' + form.cleaned_data['subject']
+            message = 'Email: ' + form.cleaned_data['email'] + '\n' + form.cleaned_data['message']
+            try:
+                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['bejipi5223@herrain.com', ])
+                messages.success(request, 'Email has been sent succesfully!')
+            except BadHeaderError:
+                return HttpResponse('BadHeaderError!')
+            return redirect('post:home')
+
+        context = {'form': form}
+        return render(request, 'user_profile/contact.html', context)
+
+    def get(self, request, **kwargs):
+        form = EmailForm()
+        context = {'form': form}
+        return render(request, 'user_profile/contact.html', context)
 
 
 class RegisterUser(View):
@@ -66,6 +91,12 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
         view_profile = self.get_object()
         followed = [True if view_profile.user in my_profile.following.all() else False]
 
+        if self.request.user.profile in self.get_object().user.following.all():
+            posts = self.get_object().post_set.all()
+        else:
+            posts = self.get_object().post_set.exclude(followers_only=True)
+
+        context['posts'] = posts
         context['my_profile'] = my_profile
         context['view_profile'] = view_profile
         context['follow'] = followed

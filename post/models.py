@@ -10,8 +10,8 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True)
     picture = models.ImageField(upload_to='post_pictures/')
-
     tags = TaggableManager()
+    followers_only = models.BooleanField(default=False)
 
     @property
     def comments(self):
