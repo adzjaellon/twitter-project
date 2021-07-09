@@ -20,11 +20,11 @@
                             <div class="post-details">
                                 <div class="post-meta d-flex justify-content-between">
                                     <div class="date meta-last">{{ post.created|timesince }}</div>
-                                    <div class="category"><a href="#">
+                                    <div class="category">
                                         {% for tag in post.tags.all %}
-                                            {{ tag }}
+                                            <a href="{% url 'post:tag-posts' tag.name %}">{{ tag }}</a>
                                         {% endfor %}
-                                    </a></div>
+                                   </div>
                                 </div>
                                 <a href="post.html"></a>
                                 <p class="text-muted">{{ post.body }}</p>

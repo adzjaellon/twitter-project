@@ -82,6 +82,15 @@ class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
     context_object_name = 'post'
     form_class = CommentCreateForm
 
+    def get_object(self, queryset=None):
+        slug = self.kwargs['slug']
+        post = Post.objects.get(slug=slug)
+
+        if self.request.user.profile not in post.author.user.following.all() and post.followers_only and self.request.user.profile != post.author:
+            return None
+        else:
+            return post
+
     def post(self, *args, **kwargs):
         form = self.get_form()
 
