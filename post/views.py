@@ -17,7 +17,7 @@ class Search(View):
     def get(self, request, **kwargs):
         q = request.GET.get('q')
         if q:
-            queryset = Post.objects.all().filter(Q(body__icontains=q) | Q(tags__name__icontains=q)).distinct()
+            queryset = Post.objects.filter(Q(body__icontains=q) | Q(tags__name__icontains=q)).distinct()
         else:
             queryset = []
 
@@ -39,12 +39,13 @@ class PostList(LoginRequiredMixin, ListView):
         profile = Profile.objects.get(user=self.request.user)
         users = [user for user in profile.following.all()]
         posts = []
+
         if profile.user not in users:
-            posts.append(profile.post_set.all())
+            posts.append(profile.posts.all())
 
         for user in users:
             prof = Profile.objects.get(user=user)
-            posts.append(prof.post_set.all())
+            posts.append(prof.posts.all())
 
         queryset = None
         if len(posts):
@@ -84,7 +85,7 @@ class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
 
     def get_object(self, queryset=None):
         slug = self.kwargs['slug']
-        post = Post.objects.get(slug=slug)
+        post = get_object_or_404(Post, slug=slug)
 
         if self.request.user.profile not in post.author.user.following.all() and post.followers_only and self.request.user.profile != post.author:
             return None

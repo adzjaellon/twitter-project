@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from decouple import config
+from django.shortcuts import get_object_or_404
 
 
 class ContactForm(LoginRequiredMixin, View):
@@ -17,18 +18,22 @@ class ContactForm(LoginRequiredMixin, View):
             subject = form.cleaned_data['user'] + '-' + form.cleaned_data['subject']
             message = 'Email: ' + form.cleaned_data['email'] + '\n' + form.cleaned_data['message']
             try:
-                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['bejipi5223@herrain.com', ])
+                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['test@test.xx', ])
                 messages.success(request, 'Email has been sent succesfully!')
             except BadHeaderError:
                 return HttpResponse('BadHeaderError!')
             return redirect('post:home')
 
-        context = {'form': form}
+        context = {
+            'form': form
+        }
         return render(request, 'user_profile/contact.html', context)
 
     def get(self, request, **kwargs):
         form = EmailForm()
-        context = {'form': form}
+        context = {
+            'form': form
+        }
         return render(request, 'user_profile/contact.html', context)
 
 
@@ -83,7 +88,8 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
 
     def get_object(self, **kwargs):
         slug = self.kwargs.get('slug')
-        return Profile.objects.get(slug=slug)
+        profile = get_object_or_404(Profile, slug=slug)
+        return profile
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -91,10 +97,12 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
         view_profile = self.get_object()
         followed = [True if view_profile.user in my_profile.following.all() else False]
 
-        if self.request.user.profile in self.get_object().user.following.all():
-            posts = self.get_object().post_set.all()
+        if my_profile == view_profile:
+            posts = view_profile.posts.all()
+        elif my_profile in view_profile.user.following.all():
+            posts = view_profile.posts.all()
         else:
-            posts = self.get_object().post_set.exclude(followers_only=True)
+            posts = view_profile.posts.exclude(followers_only=True)
 
         context['posts'] = posts
         context['my_profile'] = my_profile

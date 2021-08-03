@@ -6,7 +6,7 @@ from taggit.managers import TaggableManager
 
 class Post(models.Model):
     body = models.TextField(max_length=700)
-    author = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='posts')
     created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, blank=True)
     picture = models.ImageField(upload_to='post_pictures/')
