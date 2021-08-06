@@ -16,4 +16,3 @@ class PostCreateForm(forms.ModelForm):
         model = Post
         fields = ('body', 'tags', 'picture', 'followers_only')
 
-

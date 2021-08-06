@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, View, UpdateView
-from .models import Profile
-from django.shortcuts import redirect, reverse, HttpResponse
-from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
-from decouple import config
-from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect, reverse, HttpResponse
+from .models import Profile
+from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm
 
 
 class ContactForm(LoginRequiredMixin, View):

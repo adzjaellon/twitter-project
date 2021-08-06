@@ -18,7 +18,13 @@
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item">Following: {{ following }}</li>
                                     <li class="list-group-item">Followers: {{ followers }}</li>
-                                    <li class="list-group-item">Total posts: {{ profile.post_set.all.count }}</li>
+                                    <li class="list-group-item">Total posts: {{ profile.get_posts_number }}</li>
+                                    <li class="list-group-item">Latest likes:
+
+                                        {% for like in profile.get_latest_likes %}
+                                            <p><a href="{% url 'post:post-details' like.post.slug %}">{{ like.post.body }}</a></p>
+                                        {% endfor %}
+                                    </li>
                                 </ul>
                             </div>
                         </p>

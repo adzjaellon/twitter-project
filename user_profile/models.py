@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from django.utils.text import slugify
+from post.models import LikeUnlike
 
 
 class Profile(models.Model):
@@ -12,8 +12,13 @@ class Profile(models.Model):
     bio = models.TextField(default='...', max_length=333)
     email = models.EmailField(blank=True)
 
+    @property
     def get_posts_number(self):
-        return self.post_set.all().count()
+        return self.posts.all().count()
+
+    @property
+    def get_latest_likes(self):
+        return LikeUnlike.objects.filter(profile=self).order_by('-created')[:4]
 
     def __str__(self):
         return self.user.username

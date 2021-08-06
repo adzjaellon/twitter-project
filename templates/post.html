@@ -29,11 +29,22 @@
                             <div class="d-flex align-items-center flex-wrap">
                                 <div class="date"><i class="icon-clock"></i>{{ post.created|timesince }}</div>
 
-                                <div class="comments meta-last"><i class="icon-comment"></i>{{ post.get_comment_number }}</div>
+                                <div class="comments"><i class="icon-comment"></i>{{ post.get_comment_number }}</div>
+                                <div class="comments meta-last"><b>{{ post.total_likes }} likes</b></div>
 
                             </div>
                         </div>
                         <div class="post-body">
+                            <form action="{% url 'post:like-post' %}" method="post">
+                                {% csrf_token %}
+                                {% if request.user.profile in post.likes.all %}
+                                    <button type="submit" value="{{post.pk}}" name="pk" class="btn btn-danger">Unlike</button>
+                                {% else %}
+                                    <button type="submit" value="{{post.pk}}" name="pk" class="btn btn-info">Like</button>
+                                {% endif %}
+                            </form>
+
+                            <br>
                             {% if request.user == post.author.user %}
                                 <a href="{% url 'post:post-delete' post.slug %}" class="btn btn-outline-danger ml-3">Delete</a>
                                 <a href="{% url 'post:post-update' post.slug %}" class="btn btn-outline-warning ml-3">Update</a>
@@ -106,7 +117,7 @@
             </div>
 
         </main>
-        {% include 'sidebar.html' with common_tags=common_tags latest_posts=latest_posts %}
+        {% include 'sidebar.html' %}
     </div>
 </div>
 

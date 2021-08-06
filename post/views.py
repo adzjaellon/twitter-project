@@ -1,16 +1,29 @@
 from django.shortcuts import render, reverse, get_object_or_404
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, View
-from .models import Post, Comment
-from django.views.generic.edit import FormMixin
-from .forms import CommentCreateForm, PostCreateForm
-from django.db.models import Count, Q
-from taggit.models import Tag
-from user_profile.models import Profile
-from itertools import chain
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.views.generic.edit import FormMixin
+from django.db.models import Count, Q
+from .models import Post, Comment, LikeUnlike
+from .forms import CommentCreateForm, PostCreateForm
+from taggit.models import Tag
+from user_profile.models import Profile
+from itertools import chain
+
+
+def tags(request):
+    return {
+        'common_tags': Post.tags.values('name').annotate(count=Count('name')).order_by('-count')[:5]
+    }
+
+
+def latest_posts(request):
+    return {
+        'latest_posts': Post.objects.order_by('-created')[:3]
+    }
 
 
 class Search(View):
@@ -24,9 +37,35 @@ class Search(View):
         context = {
             'posts': queryset,
             'latest_posts': Post.objects.order_by('-created')[:3],
-            'common_tags': Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
         }
         return render(request, 'blog.html', context)
+
+
+class LikePost(LoginRequiredMixin, View):
+    def post(self, request, **kwargs):
+        print('like post request: ', request)
+        pk = request.POST.get('pk')
+        post = Post.objects.get(pk=pk)
+        user = Profile.objects.get(user=request.user)
+
+        if user in post.likes.all():
+            post.likes.remove(user)
+        else:
+            post.likes.add(user)
+
+        like, created = LikeUnlike.objects.get_or_create(post=post, profile=user)
+
+        if created:
+            like.status = 'Like'
+            post.save()
+            like.save()
+        else:
+            if like.status == 'Like':
+                like.status = 'Unlike'
+            else:
+                like.status = 'Like'
+
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 class PostList(LoginRequiredMixin, ListView):
@@ -55,7 +94,6 @@ class PostList(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['latest_posts'] = Post.objects.order_by('-created')[:3]
-        context['common_tags'] = Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
         return context
 
 
@@ -73,7 +111,6 @@ class PostTagList(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['latest_posts'] = Post.objects.order_by('-created')[:3]
-        context['common_tags'] = Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
         return context
 
 
@@ -103,7 +140,6 @@ class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['latest_posts'] = Post.objects.order_by('-created')[:3]
-        context['common_tags'] = Post.tags.values('name').annotate(count=Count('name')).order_by('-count')
         return context
 
     def form_valid(self, form):
