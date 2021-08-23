@@ -1,8 +1,6 @@
 from django.shortcuts import render, reverse, get_object_or_404
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.crypto import get_random_string
-from django.utils.text import slugify
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.generic.edit import FormMixin
@@ -12,18 +10,6 @@ from .forms import CommentCreateForm, PostCreateForm
 from taggit.models import Tag
 from user_profile.models import Profile
 from itertools import chain
-
-
-def tags(request):
-    return {
-        'common_tags': Post.tags.values('name').annotate(count=Count('name')).order_by('-count')[:5]
-    }
-
-
-def latest_posts(request):
-    return {
-        'latest_posts': Post.objects.order_by('-created')[:3]
-    }
 
 
 class Search(View):
@@ -36,7 +22,6 @@ class Search(View):
 
         context = {
             'posts': queryset,
-            'latest_posts': Post.objects.order_by('-created')[:3],
         }
         return render(request, 'blog.html', context)
 
@@ -64,6 +49,7 @@ class LikePost(LoginRequiredMixin, View):
                 like.status = 'Unlike'
             else:
                 like.status = 'Like'
+            like.save()
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -71,7 +57,7 @@ class LikePost(LoginRequiredMixin, View):
 class PostList(LoginRequiredMixin, ListView):
     model = Post
     context_object_name = 'posts'
-    paginate_by = 4
+    paginate_by = 6
     template_name = 'blog.html'
 
     def get_queryset(self):
@@ -163,7 +149,6 @@ class PostCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user.profile
-        form.instance.slug = slugify(self.request.user.id) + slugify(get_random_string(18))
         messages.success(self.request, 'Post has been created succesfully!')
         return super().form_valid(form)
 

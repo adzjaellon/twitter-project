@@ -11,13 +11,14 @@ from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm
 
 class ContactForm(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
-        form = EmailForm(request.POST)
+        form = EmailForm(initial={'user': request.user.username}, data=request.POST)
+
         if form.is_valid():
             form.user = request.user.username
             subject = form.cleaned_data['user'] + '-' + form.cleaned_data['subject']
-            message = 'Email: ' + form.cleaned_data['email'] + '\n' + form.cleaned_data['message']
+            message = 'Email: ' + form.cleaned_data['email'] + '\n' + form.cleaned_data['message'] + '\nFrom user: ' + form.cleaned_data['user']
             try:
-                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['test@test.xx', ])
+                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['leboxan543@ampswipe.com', ])
                 messages.success(request, 'Email has been sent succesfully!')
             except BadHeaderError:
                 return HttpResponse('BadHeaderError!')
@@ -29,7 +30,7 @@ class ContactForm(LoginRequiredMixin, View):
         return render(request, 'user_profile/contact.html', context)
 
     def get(self, request, **kwargs):
-        form = EmailForm()
+        form = EmailForm(initial={'user': request.user.username})
         context = {
             'form': form
         }
@@ -71,13 +72,18 @@ class FollowUser(LoginRequiredMixin, View):
         return redirect(reverse('profile:profile-details', kwargs={'slug': view_profile.slug}))
 
 
-class ProfileList(ListView):
-    model = Profile
-    template_name = 'user_profile/profiles_list.html'
-    context_object_name = 'profiles'
+class ProfileSearch(View):
+    def get(self, request, **kwargs):
+        profile = request.GET.get('profile')
+        if profile:
+            queryset = Profile.objects.filter(user__username__icontains=profile)
+        else:
+            queryset = []
 
-    def get_queryset(self):
-        return Profile.objects.all().exclude(user=self.request.user)
+        context = {
+            'queryset': queryset
+        }
+        return render(request, 'user_profile/profile_list.html', context)
 
 
 class ProfileDetail(LoginRequiredMixin, DetailView):
@@ -107,8 +113,10 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
         context['my_profile'] = my_profile
         context['view_profile'] = view_profile
         context['follow'] = followed
-        context['following'] = my_profile.following.all().count()
-        context['followers'] = Profile.objects.filter(following=my_profile.user).count()
+        context['following'] = view_profile.following.all().count()
+        context['followers'] = Profile.objects.filter(following=view_profile.user).count()
+        context['likes'] = view_profile.get_latest_likes
+        print('latest likes', view_profile.get_latest_likes)
         return context
 
 

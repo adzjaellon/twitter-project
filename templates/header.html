@@ -45,8 +45,17 @@
                         <li class="nav-item"><a href="{% url 'profile:login' %}" class="nav-link ">Login</a>
                         </li>
                     {% endif %}
+                    <li>
+
+                        <form action="{% url 'profile:profile-search' %}" class="search-form">
+                            <div class="form-group">
+                                <input type="text" name="profile" placeholder="Search for user">
+                                <button type="submit" class="submit"><i class="icon-search"></i></button>
+                            </div>
+                        </form>
+                    </li>
                 </ul>
-                <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1"></i></a></div>
+
             </div>
         </div>
     </nav>

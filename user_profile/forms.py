@@ -20,4 +20,4 @@ class EmailForm(forms.Form):
     subject = forms.CharField(required=True)
     email = forms.EmailField(required=True)
     message = forms.CharField(widget=forms.Textarea, required=True)
-    user = forms.CharField(label=False)
+    user = forms.CharField(disabled=True, required=False)

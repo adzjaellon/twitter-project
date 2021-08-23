@@ -1,5 +1,6 @@
 from django.db import models
-from django.conf import settings
+from django.utils.crypto import get_random_string
+from django.utils.text import slugify
 from taggit.managers import TaggableManager
 
 
@@ -32,6 +33,12 @@ class Post(models.Model):
 
     def __str__(self):
         return f'Post: {self.author.user.username}-{self.created}-{self.body[:10]}'
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            slug = f'{self.author.id}-{get_random_string(18)}'
+            self.slug = slugify(slug)
+        return super().save(*args, **kwargs)
 
     class Meta:
         ordering = ('-created', )

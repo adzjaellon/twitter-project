@@ -10,9 +10,8 @@
                 <div class="form-group col-md-12">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <div class="form-group col-md-12">
-                        <button type="submit" class="btn btn-secondary mt-2">Send</button>
-                    </div>
+                    <button type="submit" class="btn btn-secondary mt-2">Send</button>
+
                 </div>
             </div>
         </form>

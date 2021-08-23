@@ -18,7 +18,7 @@ class Profile(models.Model):
 
     @property
     def get_latest_likes(self):
-        return LikeUnlike.objects.filter(profile=self).order_by('-created')[:4]
+        return LikeUnlike.objects.filter(profile=self).exclude(status='Unlike').order_by('-created')[:3]
 
     def __str__(self):
         return self.user.username

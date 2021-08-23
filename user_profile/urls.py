@@ -1,5 +1,5 @@
 from django.urls import path, reverse_lazy
-from .views import ProfileDetail, FollowUser, RegisterUser, ProfileUpdate, ContactForm
+from .views import ProfileDetail, FollowUser, RegisterUser, ProfileUpdate, ContactForm, ProfileSearch
 from django.contrib.auth import views as auth_views
 
 app_name = 'profile'
@@ -7,6 +7,7 @@ app_name = 'profile'
 urlpatterns = [
     path('<slug:slug>/details/', ProfileDetail.as_view(), name='profile-details'),
     path('<slug:slug>/update/', ProfileUpdate.as_view(), name='profile-update'),
+    path('search_profile/', ProfileSearch.as_view(), name='profile-search'),
     path('support/', ContactForm.as_view(), name='contact'),
     path('follow/', FollowUser.as_view(), name='follow'),
     path('register/', RegisterUser.as_view(), name='register'),

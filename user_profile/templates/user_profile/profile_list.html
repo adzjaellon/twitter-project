@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+
+            {% for profile in queryset %}
+                <div class="row g-0">
+                    <div class="col-md-1">
+                        <a href="{% url 'profile:profile-details' profile.slug %}">
+                            <img class="profile-picture" src="{{ profile.avatar.url }}" alt="...">
+                        </a>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <a href="{% url 'profile:profile-details' profile.slug %}">{{ profile }}</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <h1>Theres no profile matching</h1>
+            {% endfor %}
+
+    </div>
+{% endblock content %}
