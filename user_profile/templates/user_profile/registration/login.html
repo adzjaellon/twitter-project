@@ -19,5 +19,7 @@
             <button type="submit" class="btn btn-success mb-3">Login</button>
         </form>
         Dont have an account? Create <b><a href="{% url 'profile:register' %}">here</a></b>
+        <hr>
+        <p><a href="{% url 'profile:password_reset' %}">Forgotten your password?</a></p>
     </div>
 {% endblock content %}

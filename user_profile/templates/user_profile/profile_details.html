@@ -44,10 +44,12 @@
                 {% endif %}
 
                 {% else %}
-                <a href="{% url 'profile:profile-update' profile.slug %}">Edit profile</a>
-                <p>
-                    <a href="{% url 'profile:password_change' %}">Change password</a>
-                </p>
+                    <a href="{% url 'profile:profile-update' profile.slug %}">Edit profile</a>
+
+                    <p>
+                        <a href="{% url 'profile:password_change' %}">Change password</a>
+                    </p>
+                    <a href="{% url 'profile:user-update' profile.user.id %}">Edit user details</a>
                 {% endif %}
 
                 </p>

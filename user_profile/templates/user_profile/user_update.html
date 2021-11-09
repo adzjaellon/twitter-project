@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    {% if request.user == user %}
+    <form action="" class="commenting-form" method="post" enctype="multipart/form-data">
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="form-group col-md-12">
+                    <button type="submit" class="btn btn-secondary mt-2">Update</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="row text-center">
+        <h1>You have no permission to edit that post.</h1>
+    </div>
+    {% endif %}
+
+    <hr>
+    <a class="btn btn-info" href="{% url 'profile:profile-details' user.profile.slug %}">Back</a>
+</div>
+
+{% endblock content %}

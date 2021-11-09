@@ -112,7 +112,7 @@
                     </div>
                 </div>
                 {% else %}
-                    <p>You are not following this user</p>
+                    <p>You are not following <h2><a href="{% url 'profile:profile-details' author.slug %}">{{ author }}</a></h2></p>
                 {% endif %}
             </div>
 

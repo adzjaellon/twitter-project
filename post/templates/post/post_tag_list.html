@@ -28,7 +28,7 @@
                                 </div>
                                 <a href="post.html"></a>
                                 <p class="text-muted">{{ post.body }}</p>
-                                <div class="post-footer d-flex align-items-center"><a href="#"
+                                <div class="post-footer d-flex align-items-center"><a href="{% url 'profile:profile-details' post.author.slug %}"
                                                                                       class="author d-flex align-items-center flex-wrap">
                                     <div class="avatar"><img src="{{ post.author.avatar.url }}" alt="..." class="img-fluid"></div>
                                     <div class="title"><span>{{ post.author }}</span></div>

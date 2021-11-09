@@ -10,5 +10,5 @@ def tags(request):
 
 def latest_posts(request):
     return {
-        'latest_posts': Post.objects.order_by('-created')[:3]
+        'latest_posts': Post.objects.exclude(followers_only=True).order_by('-created')[:3]
     }

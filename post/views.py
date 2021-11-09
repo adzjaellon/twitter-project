@@ -77,11 +77,6 @@ class PostList(LoginRequiredMixin, ListView):
             queryset = sorted(chain(*posts), reverse=True, key=lambda obj: obj.created)
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.order_by('-created')[:3]
-        return context
-
 
 class PostTagList(LoginRequiredMixin, ListView):
     model = Post
@@ -93,11 +88,6 @@ class PostTagList(LoginRequiredMixin, ListView):
         name = self.request.resolver_match.kwargs.get('name')
         tag = get_object_or_404(Tag, name=name)
         return Post.objects.filter(tags__name__in=[tag.name])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.order_by('-created')[:3]
-        return context
 
 
 class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
@@ -115,6 +105,12 @@ class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
         else:
             return post
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs['slug']
+        context['author'] = get_object_or_404(Post, slug=slug).author
+        return context
+
     def post(self, *args, **kwargs):
         form = self.get_form()
 
@@ -122,11 +118,6 @@ class PostDetails(LoginRequiredMixin, FormMixin, DetailView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['latest_posts'] = Post.objects.order_by('-created')[:3]
-        return context
 
     def form_valid(self, form):
         form.instance.author = self.request.user.profile

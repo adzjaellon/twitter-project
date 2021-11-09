@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import redirect, reverse, HttpResponse
 from .models import Profile
-from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm
+from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm, UserUpdateForm
+from django.contrib.auth.models import User
 
 
 class ContactForm(LoginRequiredMixin, View):
@@ -18,7 +19,7 @@ class ContactForm(LoginRequiredMixin, View):
             subject = form.cleaned_data['user'] + '-' + form.cleaned_data['subject']
             message = 'Email: ' + form.cleaned_data['email'] + '\n' + form.cleaned_data['message'] + '\nFrom user: ' + form.cleaned_data['user']
             try:
-                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['leboxan543@ampswipe.com', ])
+                send_mail(subject=subject, message=message, from_email=form.cleaned_data['email'], recipient_list=['gexalif660@ecofreon.com', ])
                 messages.success(request, 'Email has been sent succesfully!')
             except BadHeaderError:
                 return HttpResponse('BadHeaderError!')
@@ -62,7 +63,6 @@ class FollowUser(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         my_profile = Profile.objects.get(user=request.user)
         pk = request.POST.get('pk')
-        print('pk', pk)
         view_profile = Profile.objects.get(pk=pk)
 
         if view_profile.user in my_profile.following.all():
@@ -116,7 +116,6 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
         context['following'] = view_profile.following.all().count()
         context['followers'] = Profile.objects.filter(following=view_profile.user).count()
         context['likes'] = view_profile.get_latest_likes
-        print('latest likes', view_profile.get_latest_likes)
         return context
 
 
@@ -128,3 +127,13 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('profile:profile-details', kwargs={'slug': self.get_object().slug})
+
+
+class UserUpdate(LoginRequiredMixin, UpdateView):
+    model = User
+    template_name = 'user_profile/user_update.html'
+    context_object_name = 'user'
+    form_class = UserUpdateForm
+
+    def get_success_url(self):
+        return reverse('profile:profile-details', kwargs={'slug': self.get_object().profile.slug})
