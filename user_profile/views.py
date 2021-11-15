@@ -8,6 +8,11 @@ from django.shortcuts import redirect, reverse, HttpResponse
 from .models import Profile
 from .forms import UserRegisterForm, ProfileUpdateForm, EmailForm, UserUpdateForm
 from django.contrib.auth.models import User
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_text, force_bytes, DjangoUnicodeDecodeError
+from .utils import activation_token
+from django.contrib.sites.shortcuts import get_current_site
+from decouple import config
 
 
 class ContactForm(LoginRequiredMixin, View):
@@ -42,21 +47,50 @@ class RegisterUser(View):
     def post(self, request, *args, **kwargs):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Your account has been created! You can log in now.')
+            user = form.save()
+            user.is_active = False
+            user.save()
+            uidb = urlsafe_base64_encode(force_bytes(user.pk))
+            token = activation_token.make_token(user)
+            site = get_current_site(request).domain
+
+            link = reverse('profile:activate', kwargs={'uidb64': uidb, 'token': token})
+            activate_link = 'http://' + site + link
+            subject = f'[{site}] Activate your account!'
+            message = f'Yo {user.username}, use this link to activate your account: {activate_link}'
+
+            send_mail(subject=subject, message=message, from_email=config('EMAIL'), recipient_list=[user.email])
+            messages.success(request, 'Email with confirmation link has been sended!')
             return redirect('profile:login')
 
         context = {
             'form': form
         }
-        return render(request, 'registration/register.html', context)
+        return render(request, 'user_profile/registration/register.html', context)
 
     def get(self, request, *args, **kwargs):
         form = UserRegisterForm()
         context = {
             'form': form
         }
-        return render(request, 'registration/register.html', context)
+        return render(request, 'user_profile/registration/register.html', context)
+
+
+class ActivateUser(View):
+    def get(self, request, uidb64, token):
+        try:
+            pk = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=pk)
+
+            if activation_token.check_token(user, token):
+                if not user.is_active:
+                    user.is_active = True
+                    user.save()
+                messages.success(request, 'Account has been activated')
+        except Exception:
+            pass
+
+        return redirect('profile:login')
 
 
 class FollowUser(LoginRequiredMixin, View):

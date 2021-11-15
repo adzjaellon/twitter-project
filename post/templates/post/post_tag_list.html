@@ -33,7 +33,11 @@
                                     <div class="avatar"><img src="{{ post.author.avatar.url }}" alt="..." class="img-fluid"></div>
                                     <div class="title"><span>{{ post.author }}</span></div>
                                 </a>
-
+                                    {% if post.followers_only %}
+                                        <div class="comments">Followers Only</div>
+                                    {% else %}
+                                        <div class="comments">Public</div>
+                                    {% endif %}
                                     <div class="comments meta-last"><i class="icon-comment"></i>{{ post.get_comment_number }}</div>
                                 </div>
                             </div>
